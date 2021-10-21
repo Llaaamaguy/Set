@@ -60,7 +60,7 @@ while True:
 
     cv.imshow("Preview", frame)
 
-    if len(decodedCards) == 2:
+    if len(decodedCards) == 12:
         cards = []
         for i in decodedCards:
             attrs = i.split()
