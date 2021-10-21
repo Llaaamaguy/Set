@@ -68,11 +68,14 @@ while True:
             cards.append(card)
 
         print("Card objects:\n", cards)
+
         useSet = isSet.find_first_set(cards)
         if useSet:
             print("SET found:", useSet, "\n")
         else:
             print("No sets found with these cards")
+
+        decodedCards = []
 
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
