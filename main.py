@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import isSet
+from Card import Card
 import pyzbar.pyzbar as pyzbar
 import threading
 
@@ -14,6 +15,8 @@ cam = cv.VideoCapture(0)
 qrCodeDetector = cv.QRCodeDetector()
 
 font = cv.FONT_HERSHEY_SIMPLEX
+
+decodedCards = []
 
 while True:
     ret, frame = cam.read()
@@ -48,6 +51,8 @@ while True:
 
         print('Type : ', decodedObject.type)
         print('Data : ', decodedObject.data, '\n')
+        if str(decodedObject.data.decode('utf-8')) not in decodedCards:
+            decodedCards.append(str(decodedObject.data.decode('utf-8')))
 
         barCode = str(decodedObject.data)
 
@@ -55,18 +60,25 @@ while True:
 
     cv.imshow("Preview", frame)
 
-    # _, decoded_info, points, straight_qrcode = qrCodeDetector.detectAndDecodeMulti(frame)
-    #
-    # if points is not None:
-    #     if len(decoded_info) == 2:
-    #         if '' not in decoded_info:
-    #             x = threading.Thread(target=tts_set)
-    #             x.start()
-    #
-    #             print(decoded_info)
+    if len(decodedCards) == 2:
+        cards = []
+        for i in decodedCards:
+            attrs = i.split()
+            card = Card(attrs[0], attrs[1], attrs[2], attrs[3])
+            cards.append(card)
+
+        print("Card objects:\n", cards)
+        useSet = isSet.find_first_set(cards)
+        if useSet:
+            print("SET found:", useSet, "\n")
+        else:
+            print("No sets found with these cards")
 
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
 
 cam.release()
 cv.destroyAllWindows()
+
+
+
