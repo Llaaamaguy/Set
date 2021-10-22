@@ -4,6 +4,7 @@ import isSet
 from Card import Card
 import pyzbar.pyzbar as pyzbar
 import threading
+import PySimpleGUI as sg
 
 
 def tts_set():
@@ -17,6 +18,7 @@ qrCodeDetector = cv.QRCodeDetector()
 font = cv.FONT_HERSHEY_SIMPLEX
 
 decodedCards = []
+
 
 while True:
     ret, frame = cam.read()
@@ -58,7 +60,7 @@ while True:
 
         cv.putText(frame, barCode, (x, y), font, 1, (0, 255, 255), 2, cv.LINE_AA)
 
-    cv.imshow("Preview", frame)
+    cv.imshow("beta v1.0", frame)
 
     if len(decodedCards) == 12:
         cards = []
@@ -72,13 +74,23 @@ while True:
         useSet = isSet.find_first_set(cards)
         if useSet:
             print("SET found:", useSet, "\n")
+            layout = [[sg.Text(f"SET: {useSet}")], [sg.Button("OK")]]
+            window = sg.Window("Set window", layout)
+            while True:
+                event, values = window.read()
+                if event == "OK" or event == sg.WIN_CLOSED:
+                    break
+            window.close()
         else:
             print("No sets found with these cards")
 
         decodedCards = []
 
+
+
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
+
 
 cam.release()
 cv.destroyAllWindows()
