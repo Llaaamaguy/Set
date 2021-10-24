@@ -20,6 +20,7 @@ font = cv.FONT_HERSHEY_SIMPLEX
 decodedCards = []
 
 
+neededCards = 12
 while True:
     ret, frame = cam.read()
 
@@ -62,7 +63,7 @@ while True:
 
     cv.imshow("beta v1.0", frame)
 
-    if len(decodedCards) == 12:
+    if len(decodedCards) == neededCards:
         cards = []
         for i in decodedCards:
             attrs = i.split()
@@ -74,6 +75,8 @@ while True:
         useSet = isSet.find_first_set(cards)
         if useSet:
             print("SET found:", useSet, "\n")
+            if neededCards > 12:
+                neededCards -= 12
             layout = [[sg.Text(f"SET: {useSet}")], [sg.Button("OK")]]
             window = sg.Window("Set window", layout)
             while True:
@@ -83,10 +86,17 @@ while True:
             window.close()
         else:
             print("No sets found with these cards")
+            neededCards += 3
+            layout = [[sg.Text(f"No sets found")], [sg.Button("OK")]]
+            window = sg.Window("Set window", layout)
+            while True:
+                event, values = window.read()
+                if event == "OK" or event == sg.WIN_CLOSED:
+                    break
+            window.close()
 
-        decodedCards = []
-
-
+        for i in useSet:
+            decodedCards.pop(useSet.index(i))
 
     if cv.waitKey(1) & 0xFF == ord('q'):
         break
