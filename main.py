@@ -1,10 +1,10 @@
-import cv2 as cv
+#import cv2 as cv
 import numpy as np
 import isSet
 from Card import Card
 import pyzbar.pyzbar as pyzbar
 import threading
-import PySimpleGUI as sg
+#import PySimpleGUI as sg
 
 
 def tts_set():
