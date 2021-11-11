@@ -26,10 +26,7 @@ encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
 while True:
     ret, frame = cam.read()
     result, frame = cv2.imencode('.jpg', frame, encode_param)
-    """
-    Insert rest of SET image processing here (This code file should be run on a Windows machine only, it will not 
-    run on any Mac or linux machine 
-    """
+
 #    data = zlib.compress(pickle.dumps(frame, 0))
     data = pickle.dumps(frame, 0)
     size = len(data)
