@@ -12,7 +12,7 @@ import zlib
 import threading
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(('127.0.0.1', 8485))
+client_socket.connect(('192.168.0.1', 8485))
 connection = client_socket.makefile('wb')
 
 cam = cv2.VideoCapture(0)
