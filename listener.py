@@ -36,19 +36,17 @@ while True:
         data += conn.recv(4096)
     frame_data = data[:msg_size]
     data = data[msg_size:]
-    """
-    Do SET image processing 
-    """
+
     frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
     frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+    """
+    SET Processing here
+    """
     sendfdata = pickle.dumps(frame, 0)
     sendsize = len(sendfdata)
-    conn.sendall(struct.pack(">L", sendsize) + sendfdata)
-    #cv2.imshow('ImageWindow',frame)
-    """
-    Instead of imshowing the frame, send it back to the client for the user to run
-    use conn.sendall()
-    """
+    conn.send("Got frame".encode('utf-8'))
+    cv2.imshow('ImageWindow (server-side)',frame)
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
