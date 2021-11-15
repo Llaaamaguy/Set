@@ -11,8 +11,13 @@ import pickle
 import zlib
 import threading
 
+
+# You must first run the command ngrok tcp 8485
+ngrokip = input("Enter given ngrok ip: ")
+ngrokport = int(input("Enter given ngrok port: "))
+
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(('192.168.56.1', 8485))
+client_socket.connect((ngrokip, ngrokport))
 connection = client_socket.makefile('wb')
 
 cam = cv2.VideoCapture(0)
