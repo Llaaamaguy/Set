@@ -7,11 +7,21 @@ import struct ## new
 import zlib
 import base64
 import zmq
+import numpy as np
 
 HOST=''
 PORT=8485
 
 
+ngrokip = input("Enter given ngrok ip: ")
+
+context = zmq.Context()
+footage_socket = context.socket(zmq.SUB)
+footage_socket.bind(ngrokip)
+footage_socket.setsockopt_string(zmq.SUBSCRIBE, np.unicode(''))
+
+
+"""
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 print('Socket created')
 
@@ -21,6 +31,7 @@ s.listen(10)
 print('Socket now listening')
 
 conn,addr=s.accept()
+"""
 
 #data = b""
 #payload_size = struct.calcsize(">L")
@@ -52,7 +63,7 @@ while True:
     cv2.imshow('ImageWindow (server-side)',frame)
     """
 
-    frame = conn.recv_string()
+    frame = footage_socket.recv_string()
     img = base64.b64decode(frame)
     npimg = np.fromstring(img, dtype=np.uint8)
     source = cv2.imdecode(npimg, 1)

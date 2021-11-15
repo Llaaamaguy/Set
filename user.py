@@ -12,16 +12,23 @@ import zlib
 import threading
 import base64
 import zmq
+import numpy as np
 
 
 # You must first run the command ngrok tcp 8485
 ngrokip = input("Enter given ngrok ip: ")
-ngrokport = int(input("Enter given ngrok port: "))
 
 
+context = zmq.Context()
+footage_socket = context.socket(zmq.PUB)
+footage_socket.connect(ngrokip)
+
+
+"""
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((ngrokip, ngrokport))
 connection = client_socket.makefile('wb')
+"""
 
 cam = cv2.VideoCapture(0)
 
@@ -35,7 +42,7 @@ encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
 
 def recv():
     while True:
-        data = client_socket.recv(4096).decode()
+        data = footage_socket.recv(4096).decode()
         if not data:
             pass
         else:
@@ -48,7 +55,7 @@ while True:
     frame = cv2.resize(frame, (640, 480))
     encoded, buffer = cv2.imencode('.jpg', frame)
     jpg_as_text = base64.b64encode(buffer)
-    client_socket.sendall(jpg_as_text)
+    footage_socket.send(jpg_as_text)
 
     """
     result, frame = cv2.imencode('.jpg', frame, encode_param)
