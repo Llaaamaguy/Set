@@ -10,11 +10,14 @@ import time
 import pickle
 import zlib
 import threading
+import base64
+import zmq
 
 
 # You must first run the command ngrok tcp 8485
 ngrokip = input("Enter given ngrok ip: ")
 ngrokport = int(input("Enter given ngrok port: "))
+
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((ngrokip, ngrokport))
@@ -39,11 +42,15 @@ def recv():
             print(str(data))
 
 
-
 while True:
     ret, frame = cam.read()
 
+    frame = cv2.resize(frame, (640, 480))
+    encoded, buffer = cv2.imencode('.jpg', frame)
+    jpg_as_text = base64.b64encode(buffer)
+    client_socket.sendall(jpg_as_text)
 
+    """
     result, frame = cv2.imencode('.jpg', frame, encode_param)
 
     #    data = zlib.compress(pickle.dumps(frame, 0))
@@ -52,6 +59,7 @@ while True:
 
     #print("{}: {}".format(img_counter, size))
     client_socket.sendall(struct.pack(">L", size) + data)
+    """
     img_counter += 1
     if img_counter == 1:
         print("Started listening")

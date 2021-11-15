@@ -5,9 +5,12 @@ import pickle
 import numpy as np
 import struct ## new
 import zlib
+import base64
+import zmq
 
 HOST=''
 PORT=8485
+
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 print('Socket created')
@@ -19,10 +22,11 @@ print('Socket now listening')
 
 conn,addr=s.accept()
 
-data = b""
-payload_size = struct.calcsize(">L")
-print("payload_size: {}".format(payload_size))
+#data = b""
+#payload_size = struct.calcsize(">L")
+#print("payload_size: {}".format(payload_size))
 while True:
+    """
     while len(data) < payload_size:
         print("Recv: {}".format(len(data)))
         data += conn.recv(4096)
@@ -39,13 +43,20 @@ while True:
 
     frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
     frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-    """
+    
     SET Processing here
-    """
+    
     sendfdata = pickle.dumps(frame, 0)
     sendsize = len(sendfdata)
-    conn.send("Got frame".encode('utf-8'))
+    conn.send("Hello from server".encode('utf-8'))
     cv2.imshow('ImageWindow (server-side)',frame)
+    """
+
+    frame = conn.recv_string()
+    img = base64.b64decode(frame)
+    npimg = np.fromstring(img, dtype=np.uint8)
+    source = cv2.imdecode(npimg, 1)
+    cv2.imshow("Stream", source)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
