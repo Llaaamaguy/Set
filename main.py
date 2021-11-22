@@ -1,16 +1,19 @@
 import cv2 as cv
 import numpy as np
+import functools
 import isSet
 from Card import Card
 import pyzbar.pyzbar as pyzbar
-import threading
 import PySimpleGUI as sg
-import zbarlight
+from threading import Thread
+import pyttsx3 as tts
 
 
-def tts_set():
-    # Does TTS
-    pass
+def tts_set(cards):
+    engine = tts.init()
+    toSay = f"Found a set. {cards[0]}, {cards[1]}, {cards[2]}"
+    engine.say(toSay)
+    engine.runAndWait()
 
 
 cam = cv.VideoCapture(0)
@@ -24,8 +27,11 @@ decodedCards = []
 neededCards = 12
 while True:
     ret, frame = cam.read()
+    frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    bwthresh, frame = cv.threshold(frame, 127, 255, cv.THRESH_BINARY)
 
     objs = pyzbar.decode(frame)
+    h, w= frame.shape
 
     for o in objs:
         print(o)
@@ -61,10 +67,14 @@ while True:
         barCode = str(decodedObject.data)
 
         cv.putText(frame, barCode, (x, y), font, 1, (0, 255, 255), 2, cv.LINE_AA)
+        #toShow = f"Looking for {neededCards} cards"
+        #offset = int(h/8)-10
+        #cv.putText(frame, toShow, (20, offset), font, 1, (0,255,255), 2)
+        #toShow = f"Currently have {str(len(decodedCards))} cards"
+        #cv.putText(frame, toShow, (20, offset*2), font, 1, (0,255,255), 2)
+    cv.imshow("beta v1.4", frame)
 
-    cv.imshow("beta v1.0", frame)
-
-    if len(decodedCards) == neededCards:
+    if len(decodedCards) >= neededCards:
         cards = []
         for i in decodedCards:
             attrs = i.split()
@@ -76,10 +86,13 @@ while True:
         useSet = isSet.find_first_set(cards)
         if useSet:
             print("SET found:", useSet, "\n")
-            if neededCards > 12:
-                neededCards -= 12
+
             layout = [[sg.Text(f"SET: {useSet}")], [sg.Button("OK")]]
             window = sg.Window("Set window", layout)
+
+            # Call TTS voice asyncronously
+            Thread(target=functools.partial(tts_set, useSet)).start()
+
             while True:
                 event, values = window.read()
                 if event == "OK" or event == sg.WIN_CLOSED:
