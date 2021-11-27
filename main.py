@@ -72,7 +72,7 @@ while True:
         #cv.putText(frame, toShow, (20, offset), font, 1, (0,255,255), 2)
         #toShow = f"Currently have {str(len(decodedCards))} cards"
         #cv.putText(frame, toShow, (20, offset*2), font, 1, (0,255,255), 2)
-    cv.imshow("beta v1.4", frame)
+    cv.imshow("SET official v1.5.2", frame)
 
     if len(decodedCards) >= neededCards:
         cards = []
